@@ -53,8 +53,8 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('', 'DockerHubCred') {
-                        sh 'docker tag calculator adityavshinde/calculator:latest'
-                        sh 'docker push adityavshinde/calculator'
+                        sh 'docker tag adityavshinde/calculator:latest adityavshinde/calculator:latest'
+                        sh 'docker push adityavshinde/calculator:latest'
                     }
                 }
             }
