@@ -1,0 +1,33 @@
+- name: Deploy SPE MiniProject using Docker
+  hosts: localhost
+  become: yes
+
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Start Docker Service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Remove old container (if exists)
+      command: docker rm -f spe_container
+      ignore_errors: yes
+
+    - name: Remove old untagged images
+      command: docker rmi $(docker images -q -f "dangling=true")
+      ignore_errors: yes
+
+    - name: Build Docker Image
+      command: docker build -t spe_miniproject .
+
+    - name: Run Docker Container
+      command: docker run -d -p 5000:5000 --name spe_container spe_miniproject
+
+    - name: Remove old untagged images
+      shell: docker rmi $(docker images -f "dangling=true" -q) || true
+
