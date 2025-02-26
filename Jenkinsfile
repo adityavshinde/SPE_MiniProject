@@ -4,6 +4,7 @@ pipeline {
         githubPush()
     }
     environment {
+	PATH = "${env.PATH}:/var/lib/jenkins/.local/bin"
         DOCKER_IMAGE_NAME = 'adityavshinde/calculator'
         GITHUB_REPO_URL = 'https://github.com/adityavshinde/SPE_MiniProject.git'
     }
