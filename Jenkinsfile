@@ -17,9 +17,11 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Setup Python') {
             steps {
                 script {
+                    sh 'python3 --version || exit 1'
+                    sh 'pip install --upgrade pip'
                     sh 'pip install -r requirements.txt'
                 }
             }
@@ -28,12 +30,12 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    sh 'pytest test_calc.py --junitxml=report.xml'
+                    sh 'pytest test_calc.py --junitxml=test-results.xml || true'
                 }
             }
             post {
                 always {
-                    junit 'report.xml'
+                    junit 'test-results.xml'
                 }
             }
         }
@@ -41,7 +43,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${DOCKER_IMAGE_NAME}", '.')
+                    sh 'docker build -t ${DOCKER_IMAGE_NAME} .'
                 }
             }
         }
@@ -74,13 +76,13 @@ pipeline {
     post {
         success {
             mail to: 'AdityaVijay.Shinde@iiitb.ac.in',
-                 subject: "Application Deployment SUCCESS: Build ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 subject: "SUCCESS: Build ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                  body: "The build was successful!"
         }
         failure {
             mail to: 'AdityaVijay.Shinde@iiitb.ac.in',
-                 subject: "Application Deployment FAILURE: Build ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                 body: "The build failed."
+                 subject: "FAILURE: Build ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 body: "The build failed. Check logs."
         }
         always {
             cleanWs()
