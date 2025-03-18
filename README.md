@@ -1,1 +1,2 @@
-# SPE_MiniProject
+# SPE_MiniProject (Scientific Calculator using DevOps)
+
